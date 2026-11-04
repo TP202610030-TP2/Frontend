@@ -1,0 +1,45 @@
+<mat-sidenav-container class="sidenav-container">
+
+  <!-- Sidenav lateral -->
+  <mat-sidenav
+    #sidenav
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="!isMobile()"
+    class="sidenav">
+
+    <!-- Logo -->
+    <div class="sidenav-logo">
+      <div class="logo-icon-wrap">
+        <mat-icon>record_voice_over</mat-icon>
+      </div>
+      <span class="logo-text">ASR Quechua</span>
+    </div>
+
+    <!-- Navegación -->
+    <mat-nav-list>
+      @for (item of navItems; track item.route) {
+        <a
+          mat-list-item
+          [routerLink]="item.route"
+          routerLinkActive="nav-active"
+          [routerLinkActiveOptions]="{ exact: false }">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Contenido principal -->
+  <mat-sidenav-content class="main-wrapper">
+    <app-navbar
+      [userName]="userName()"
+      [userEmail]="userEmail()"
+      (menuToggle)="sidenav.toggle()" />
+
+    <main class="main-content">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

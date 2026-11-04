@@ -1,0 +1,88 @@
+@use '@angular/material' as mat;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@include mat.core();
+
+$asr-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$green-palette,
+    tertiary: mat.$orange-palette,
+  ),
+  density: (scale: 0),
+));
+
+$asr-dark-theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: mat.$green-palette,
+    tertiary: mat.$orange-palette,
+  ),
+  density: (scale: 0),
+));
+
+:root {
+  @include mat.all-component-themes($asr-theme);
+
+  --color-primary:       #2E7D32;
+  --color-primary-light: #60AD5E;
+  --color-primary-dark:  #005005;
+  --color-accent:        #F57F17;
+  --color-accent-light:  #FFAD42;
+  --color-accent-dark:   #BC5100;
+
+  // Surface tokens (switch in dark)
+  --bg-app:        #f4f6f4;
+  --bg-surface:    #ffffff;
+  --bg-surface-2:  #f7faf7;
+  --text-primary:  #0d1f0f;
+  --text-secondary:#445544;
+  --text-muted:    #8a9e8b;
+  --border-color:  #dde8dd;
+  --sidenav-bg:    #ffffff;
+  --sidenav-hover: rgba(46,125,50,.08);
+  --shadow-card:   0 2px 12px rgba(0,0,0,.07);
+}
+
+html.dark {
+  @include mat.all-component-colors($asr-dark-theme);
+
+  --bg-app:        #0f1a10;
+  --bg-surface:    #182019;
+  --bg-surface-2:  #1e281f;
+  --text-primary:  #e8f0e9;
+  --text-secondary:#9ab89b;
+  --text-muted:    #607860;
+  --border-color:  #2a3d2b;
+  --sidenav-bg:    #141f15;
+  --sidenav-hover: rgba(96,173,94,.12);
+  --shadow-card:   0 2px 16px rgba(0,0,0,.35);
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: Roboto, Inter, 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  transition: background-color .3s ease, color .3s ease;
+}
+
+// Smooth transitions on dark toggle for common elements
+* {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: .25s;
+  transition-timing-function: ease;
+}
+
+// Override transition for animated elements (don't slow down animations)
+.bar, .blob, .cta-icon, .badge-dot, .status-dot, .cursor {
+  transition: none !important;
+}

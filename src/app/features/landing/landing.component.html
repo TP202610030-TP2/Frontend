@@ -1,0 +1,210 @@
+<!-- ── NAVBAR ───────────────────────────────────────────── -->
+<header class="landing-nav" [class.scrolled]="isScrolled()">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="logo-icon-wrap">
+        <mat-icon>record_voice_over</mat-icon>
+      </div>
+      <span>ASR Quechua</span>
+    </div>
+    <div class="nav-actions">
+      <a mat-button routerLink="/auth/login">Iniciar sesión</a>
+      <a mat-raised-button color="primary" routerLink="/auth/register">
+        <mat-icon>person_add</mat-icon>
+        Registrarse
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<section class="hero-section">
+
+  <!-- Fondo animado -->
+  <div class="hero-bg" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span>Quechua · ASR · IA · OpenAI Whisper</span>
+    </div>
+
+    <h1 class="hero-title">
+      Transcripción automática<br>
+      de voz en <span class="highlight">Quechua</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Plataforma académica de reconocimiento automático de habla construida con
+      Whisper de OpenAI y desplegada en Azure Container Apps.
+    </p>
+
+    <div class="hero-ctas">
+      <a mat-raised-button color="primary" routerLink="/auth/register" class="cta-primary">
+        <mat-icon>rocket_launch</mat-icon>
+        Crear cuenta gratuita
+      </a>
+      <a mat-button href="#features" class="cta-ghost">
+        <mat-icon>explore</mat-icon>
+        Ver características
+      </a>
+    </div>
+
+    <div class="hero-trust">
+      <span class="trust-item"><mat-icon>lock</mat-icon> JWT seguro</span>
+      <span class="trust-item"><mat-icon>speed</mat-icon> &lt;2s latencia</span>
+      <span class="trust-item"><mat-icon>cloud</mat-icon> Azure</span>
+    </div>
+  </div>
+
+  <!-- Demo card -->
+  <div class="hero-visual">
+    <div class="demo-card">
+      <div class="demo-card-header">
+        <div class="demo-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <span class="demo-title">ASR Live Demo</span>
+        <span class="demo-status">
+          <span class="status-dot"></span> Live
+        </span>
+      </div>
+
+      <div class="demo-wave-area">
+        <mat-icon class="wave-icon">graphic_eq</mat-icon>
+        <div class="waveform-bars">
+          @for (h of waveHeights; track $index) {
+            <div class="bar" [style.--h]="h + 'px'"></div>
+          }
+        </div>
+      </div>
+
+      <div class="demo-transcript">
+        <p class="transcript-label">Transcripción en vivo</p>
+        <p class="transcript-text">
+          {{ typedText() }}<span class="cursor" aria-hidden="true">|</span>
+        </p>
+      </div>
+
+      <div class="demo-footer">
+        <span class="demo-chip">
+          <mat-icon>check_circle</mat-icon>
+          Confianza: 94.2%
+        </span>
+        <span class="demo-chip">
+          <mat-icon>timer</mat-icon>
+          1.3 s
+        </span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ── CÓMO FUNCIONA ────────────────────────────────────── -->
+<section class="how-section reveal-section">
+  <div class="section-inner">
+    <p class="section-label">Proceso</p>
+    <h2 class="section-title">¿Cómo funciona?</h2>
+    <p class="section-subtitle">Tres pasos para transcribir audio Quechua</p>
+
+    <div class="steps-grid">
+      @for (step of steps; track step.num) {
+        <div class="step-item">
+          <span class="step-num">{{ step.num }}</span>
+          <div class="step-icon-wrap">
+            <mat-icon>{{ step.icon }}</mat-icon>
+          </div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.desc }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── CARACTERÍSTICAS ──────────────────────────────────── -->
+<section id="features" class="features-section reveal-section">
+  <div class="section-inner">
+    <p class="section-label">Características</p>
+    <h2 class="section-title">¿Qué puedes hacer?</h2>
+    <p class="section-subtitle">Tres formas de transcribir voz Quechua con nuestra plataforma</p>
+
+    <div class="features-grid">
+      @for (f of features; track f.title) {
+        <div class="feature-card">
+          <div class="feature-glow" aria-hidden="true"></div>
+          <div class="feature-icon-wrapper">
+            <mat-icon>{{ f.icon }}</mat-icon>
+          </div>
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.description }}</p>
+          <div class="feature-arrow" aria-hidden="true">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── ESTADÍSTICAS ─────────────────────────────────────── -->
+<section class="stats-section reveal-section">
+  <div class="section-inner">
+    <div class="stats-grid">
+      @for (s of stats; track s.label) {
+        <div class="stat-item">
+          <div class="stat-icon-wrap">
+            <mat-icon>{{ s.icon }}</mat-icon>
+          </div>
+          <span class="stat-value">{{ s.value }}</span>
+          <span class="stat-label">{{ s.label }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA FINAL ─────────────────────────────────────────── -->
+<section class="final-cta-section reveal-section">
+  <div class="cta-bg" aria-hidden="true">
+    <div class="cta-blob cta-blob-1"></div>
+    <div class="cta-blob cta-blob-2"></div>
+  </div>
+  <div class="section-inner cta-content">
+    <mat-icon class="cta-icon" aria-hidden="true">auto_awesome</mat-icon>
+    <h2 class="cta-title">¿Listo para comenzar?</h2>
+    <p class="cta-subtitle">
+      Crea tu cuenta gratuita y empieza a transcribir audio Quechua ahora mismo.
+    </p>
+    <div class="cta-actions">
+      <a mat-raised-button color="primary" routerLink="/auth/register" class="cta-primary">
+        <mat-icon>person_add</mat-icon>
+        Crear cuenta gratuita
+      </a>
+      <a mat-button routerLink="/auth/login" class="cta-ghost">
+        Ya tengo cuenta
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<footer class="landing-footer">
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <mat-icon>record_voice_over</mat-icon>
+      <span>ASR Quechua</span>
+    </div>
+    <p class="footer-copy">© 2026 Plataforma ASR Quechua · Proyecto académico</p>
+    <a routerLink="/app/docs" class="footer-link">Documentación API</a>
+  </div>
+</footer>

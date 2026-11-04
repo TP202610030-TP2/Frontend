@@ -1,0 +1,80 @@
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 248px;
+  background-color: var(--sidenav-bg);
+  border-right: 1px solid var(--border-color);
+  transition: background-color .3s, border-color .3s;
+}
+
+.sidenav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--border-color);
+
+  .logo-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(46, 125, 50, .3);
+
+    mat-icon {
+      font-size: 19px;
+      width: 19px;
+      height: 19px;
+      color: white;
+    }
+  }
+
+  .logo-text {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: -.2px;
+  }
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--bg-app);
+  transition: background-color .3s;
+}
+
+// Nav item activo
+::ng-deep .nav-active {
+  background: var(--sidenav-hover) !important;
+  border-left: 3px solid var(--color-primary) !important;
+  border-radius: 0 8px 8px 0 !important;
+
+  mat-icon,
+  span {
+    color: var(--color-primary) !important;
+    font-weight: 700;
+  }
+}
+
+// Scrollbar custom en sidenav
+::ng-deep .mat-drawer-inner-container {
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+
+  &::-webkit-scrollbar       { width: 4px; }
+  &::-webkit-scrollbar-track  { background: transparent; }
+  &::-webkit-scrollbar-thumb  { background: var(--border-color); border-radius: 2px; }
+}
