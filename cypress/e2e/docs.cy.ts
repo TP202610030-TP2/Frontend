@@ -5,7 +5,7 @@ describe('API Docs — E3-HU02, E3-HU03', () => {
   });
 
   it('iframe con Swagger UI existe — E3-HU02-S01', () => {
-    cy.get('iframe[title="Documentación API ASR Quechua"]').should('exist');
+    cy.get('iframe[title="Swagger UI — ASR Quechua API"]').should('exist');
   });
 
   it('botón copiar token es visible — E3-HU02-S03', () => {

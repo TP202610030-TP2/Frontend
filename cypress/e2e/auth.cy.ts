@@ -27,8 +27,11 @@ describe('Autenticación — E1-HU01, E1-HU02, E1-HU05', () => {
 
   it('logout desde dashboard — E1-HU05', () => {
     cy.login(email, password);
-    cy.contains('button', /cerrar sesión/i).click({ force: true });
-    cy.contains('button', /cerrar sesión/i).last().click();
+    // "Cerrar sesión" está dentro del menú del usuario en la barra superior
+    cy.get('button.user-btn').click();
+    cy.contains('button[mat-menu-item]', /cerrar sesión/i).click();
+    // Diálogo de confirmación
+    cy.get('mat-dialog-actions').contains('button', /cerrar sesión/i).click();
     cy.url().should('include', '/auth/login');
   });
 });
