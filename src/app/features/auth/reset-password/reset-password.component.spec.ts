@@ -20,11 +20,11 @@ const VALID_FORM = { password: 'Abc12345', confirmPassword: 'Abc12345' };
 describe('ResetPasswordComponent', () => {
   let component: ResetPasswordComponent;
   let fixture:   ComponentFixture<ResetPasswordComponent>;
-  let authSvc:  { resetPassword: jest.Mock };
+  let authSvc:  { resetPassword: jest.Mock; discardLocalSession: jest.Mock };
   let snackBar: { open: jest.Mock };
 
   async function setup(token: string | null) {
-    authSvc  = { resetPassword: jest.fn().mockReturnValue(of(void 0)) };
+    authSvc  = { resetPassword: jest.fn().mockReturnValue(of(void 0)), discardLocalSession: jest.fn() };
     snackBar = { open: jest.fn() };
 
     await TestBed.configureTestingModule({
@@ -48,6 +48,7 @@ describe('ResetPasswordComponent', () => {
     component.form.patchValue(VALID_FORM);
     component.submit();
     expect(authSvc.resetPassword).toHaveBeenCalledWith('valid-token-abc', 'Abc12345');
+    expect(authSvc.discardLocalSession).toHaveBeenCalled();
     expect(snackBar.open).toHaveBeenCalledWith(
       'Contraseña actualizada correctamente.',
       'OK',

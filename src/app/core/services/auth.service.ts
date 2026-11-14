@@ -85,6 +85,12 @@ export class AuthService {
     return payload.exp * 1000 < Date.now();
   }
 
+  /** Descarta la sesión local sin llamar al backend ni navegar (p. ej. tras restablecer la contraseña). */
+  discardLocalSession(): void {
+    localStorage.removeItem('asr_token');
+    this._currentUser.set(null);
+  }
+
   private clearSession(): void {
     localStorage.removeItem('asr_token');
     this._currentUser.set(null);

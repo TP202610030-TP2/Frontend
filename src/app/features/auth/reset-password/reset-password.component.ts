@@ -129,6 +129,9 @@ export class ResetPasswordComponent implements OnInit {
     this.authSvc.resetPassword(this.token, this.form.value.password!).subscribe({
       next: () => {
         this.loading = false;
+        // Si había una sesión abierta en este navegador se cierra: el usuario
+        // debe iniciar sesión con la nueva contraseña.
+        this.authSvc.discardLocalSession();
         this.snackBar.open('Contraseña actualizada correctamente.', 'OK', { duration: 5000 });
         this.router.navigate(['/auth/login']);
       },

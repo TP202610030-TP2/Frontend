@@ -11,7 +11,8 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
-    canActivate: [publicGuard],
+    // publicGuard se aplica por ruta en auth.routes: /auth/reset-password debe
+    // abrirse desde el enlace del correo aunque haya una sesión iniciada.
     loadChildren: () => import('./features/auth/auth.routes').then(m => m.authRoutes),
   },
   {
