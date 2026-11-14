@@ -1,8 +1,5 @@
 {
   "projects": {
-    "default": "asr-quechua-frontend",
-    "asr-quechua": "asr-quechua-frontend-b722a"
-  },
-  "targets": {},
-  "etags": {}
+    "default": "asr-quechua"
+  }
 }
