@@ -8,10 +8,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { AuthService } from '@core/services/auth.service';
 
-const GENERIC_MSG =
-  'Si el correo existe en nuestro sistema, recibirás instrucciones de recuperación en breve.';
+/** HU0004 — mensajes de resultado de la solicitud de recuperación. */
+export const RECOVERY_MSG = {
+  sent:     (email: string) =>
+    `Te enviamos las instrucciones de recuperación a ${email}. Revisa tu bandeja de entrada y la carpeta de spam; el enlace caduca en 1 hora.`,
+  notFound: 'No se encontró ningún usuario registrado con ese correo electrónico.',
+  emailFailed:
+    'No pudimos enviar el correo de recuperación en este momento. Inténtalo de nuevo en unos minutos.',
+  generic:  'Ocurrió un error al procesar la solicitud. Inténtalo nuevamente.',
+} as const;
 
 @Component({
   selector: 'app-forgot-password',
@@ -43,10 +52,16 @@ const GENERIC_MSG =
 
           @if (submitted) {
             <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center text-green-800 text-sm"
-                 role="status">
-              {{ genericMsg }}
+                 role="status" data-testid="recovery-success">
+              {{ successMsg }}
             </div>
           } @else {
+            @if (errorMsg) {
+              <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-center text-red-800 text-sm"
+                   role="alert" data-testid="recovery-error">
+                {{ errorMsg }}
+              </div>
+            }
             <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
 
               <mat-form-field appearance="outline" class="w-full">
@@ -93,15 +108,26 @@ export class ForgotPasswordComponent {
 
   loading    = false;
   submitted  = false;
-  genericMsg = GENERIC_MSG;
+  successMsg = '';
+  errorMsg: string | null = null;
 
   submit(): void {
     if (this.form.invalid) return;
-    this.loading = true;
-    this.authSvc.requestRecovery(this.form.value.email!).subscribe({
-      next:  () => { this.loading = false; this.submitted = true; },
-      // seguridad por oscuridad: mismo mensaje independientemente del resultado
-      error: () => { this.loading = false; this.submitted = true; },
+    const email = this.form.value.email!.trim();
+    this.loading  = true;
+    this.errorMsg = null;
+    this.authSvc.requestRecovery(email).subscribe({
+      next: () => {
+        this.loading    = false;
+        this.submitted  = true;
+        this.successMsg = RECOVERY_MSG.sent(email);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.loading  = false;
+        this.errorMsg = err?.status === 404 ? RECOVERY_MSG.notFound
+                      : err?.status === 503 ? RECOVERY_MSG.emailFailed
+                      : RECOVERY_MSG.generic;
+      },
     });
   }
 }

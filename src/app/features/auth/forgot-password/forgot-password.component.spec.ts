@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 
-import { ForgotPasswordComponent } from './forgot-password.component';
+import { ForgotPasswordComponent, RECOVERY_MSG } from './forgot-password.component';
 import { AuthService } from '@core/services/auth.service';
 
 describe('ForgotPasswordComponent', () => {
@@ -28,17 +28,31 @@ describe('ForgotPasswordComponent', () => {
     fixture.detectChanges();
   });
 
-  it('muestra mensaje genérico tras envío (éxito) — E1-HU04-S01', () => {
+  it('confirma el envío de instrucciones al correo registrado — CP007', () => {
     component.form.patchValue({ email: 'user@example.com' });
     component.submit();
+    expect(authSvc.requestRecovery).toHaveBeenCalledWith('user@example.com');
     expect(component.submitted).toBe(true);
-    expect(component.genericMsg).toContain('Si el correo existe en nuestro sistema');
+    expect(component.errorMsg).toBeNull();
+    expect(component.successMsg).toBe(RECOVERY_MSG.sent('user@example.com'));
   });
 
-  it('muestra mismo mensaje genérico aunque el servicio falle — E1-HU04-S02', () => {
+  it('informa que el usuario no fue encontrado (404) — CP008', () => {
     authSvc.requestRecovery.mockReturnValue(throwError(() => ({ status: 404 })));
     component.form.patchValue({ email: 'noexiste@example.com' });
     component.submit();
-    expect(component.submitted).toBe(true);
+    fixture.detectChanges();
+    expect(component.submitted).toBe(false);
+    expect(component.errorMsg).toBe(RECOVERY_MSG.notFound);
+    const alert = fixture.nativeElement.querySelector('[data-testid="recovery-error"]');
+    expect(alert.textContent).toContain('No se encontró ningún usuario registrado');
+  });
+
+  it('informa cuando el correo no pudo enviarse (503)', () => {
+    authSvc.requestRecovery.mockReturnValue(throwError(() => ({ status: 503 })));
+    component.form.patchValue({ email: 'user@example.com' });
+    component.submit();
+    expect(component.submitted).toBe(false);
+    expect(component.errorMsg).toBe(RECOVERY_MSG.emailFailed);
   });
 });
