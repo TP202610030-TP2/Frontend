@@ -4,7 +4,7 @@ import { map, Observable } from 'rxjs';
 
 import { environment as env } from '@env/environment';
 import { API } from '@core/api/endpoints.registry';
-import { DashboardData, DashboardResponse } from '@core/models/dashboard.models';
+import { DashboardData, DashboardResponse, ServiceStatusMap, ServicesStatusResponse } from '@core/models/dashboard.models';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
@@ -15,5 +15,12 @@ export class DashboardService {
     return this.http
       .get<DashboardResponse>(`${env.apiUrl}${API.dashboard.summary.path}`)
       .pipe(map(r => r.data!));
+  }
+
+  /** GET /api/v1/dashboard/services — solo el estado de los servicios (sondeo liviano) */
+  getServices(): Observable<ServiceStatusMap> {
+    return this.http
+      .get<ServicesStatusResponse>(`${env.apiUrl}${API.dashboard.services.path}`)
+      .pipe(map(r => r.data!.services));
   }
 }

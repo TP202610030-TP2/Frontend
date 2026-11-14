@@ -202,7 +202,8 @@ const SECTIONS = [
     .card-title   { font-size: 1rem !important; font-weight: 700 !important; color: var(--text-primary) !important; margin: 0 !important; }
     .card-subtitle { font-size: .8rem !important; color: var(--text-muted) !important; margin: 2px 0 0 !important; }
 
-    .card-body { padding: 20px 24px 24px !important; }
+    .card-body { padding: 24px 24px 20px !important; }
+    .settings-card > mat-divider { border-top-color: var(--border-color) !important; }
 
     /* Dark mode banner */
     .dark-mode-banner {

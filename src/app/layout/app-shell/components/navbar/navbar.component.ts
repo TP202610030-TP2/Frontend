@@ -50,7 +50,7 @@ import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confir
       <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
         <div class="avatar">{{ initials() }}</div>
         <span class="hidden sm:inline user-name">{{ userName || userEmail }}</span>
-        <mat-icon class="chevron">arrow_drop_down</mat-icon>
+        <mat-icon class="chevron" iconPositionEnd>arrow_drop_down</mat-icon>
       </button>
 
       <mat-menu #userMenu="matMenu" xPosition="before" class="user-menu">
@@ -101,13 +101,20 @@ import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confir
 
     .user-btn {
       color: white;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
+      height: 44px;
       border-radius: 10px;
-      padding: 4px 10px;
+      padding: 4px 6px 4px 10px;
       min-width: unset;
       &:hover { background: rgba(255,255,255,.12); }
+    }
+
+    /* mat-button envuelve el contenido en .mdc-button__label: avatar y nombre en una fila */
+    :host ::ng-deep .user-btn .mdc-button__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .avatar, .menu-avatar {
@@ -133,8 +140,11 @@ import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confir
       color: white;
     }
 
-    .user-name { font-size: .88rem; font-weight: 500; }
-    .chevron   { font-size: 18px; opacity: .7; }
+    .user-name {
+      font-size: .88rem; font-weight: 500; color: white;
+      max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .chevron   { font-size: 20px; width: 20px; height: 20px; margin-left: 2px; opacity: .8; color: white; }
 
     .menu-header {
       display: flex;

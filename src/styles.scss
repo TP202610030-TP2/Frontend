@@ -86,3 +86,12 @@ body {
 .bar, .blob, .cta-icon, .badge-dot, .status-dot, .cursor {
   transition: none !important;
 }
+
+// ── Angular Material + Tailwind preflight ───────────────────────────────────
+// With Tailwind's preflight, the notch of outlined form fields ends up with
+// 1px left/right borders, drawing vertical lines around the label (fields
+// looked shifted/misaligned in login, register and settings).
+.mat-mdc-form-field .mdc-notched-outline__notch {
+  border-left-style: none !important;
+  border-right-style: none !important;
+}

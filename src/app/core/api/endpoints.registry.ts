@@ -24,6 +24,7 @@ export const API = {
   },
   dashboard: {
     summary: { path: '/api/v1/dashboard', timeout: 15_000 }, // E1-HU06 — responde ApiEnvelope<DashboardData>
+    services: { path: '/api/v1/dashboard/services', timeout: 10_000 }, // solo estado de servicios
     status:  { path: '/api/v1/status',    timeout: 10_000 }, // health check de microservicios
   },
   users: {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,7 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { DashboardService } from '@core/services/dashboard.service';
 import { AuthService } from '@core/services/auth.service';
-import type { DashboardData } from '@core/models/dashboard.models';
+import type { DashboardData, ServiceStatusMap } from '@core/models/dashboard.models';
+import { RelativeTimePipe } from '@shared/pipes/relative-time.pipe';
 import { StatsCardComponent } from './components/stats-card/stats-card.component';
 import { ServiceStatusListComponent } from './components/service-status-list/service-status-list.component';
 import { QuickActionsComponent } from './components/quick-actions/quick-actions.component';
@@ -24,6 +25,7 @@ import { ErrorBannerComponent } from '@shared/components/error-banner/error-bann
     ServiceStatusListComponent,
     QuickActionsComponent,
     ErrorBannerComponent,
+    RelativeTimePipe,
   ],
   template: `
     <div class="dashboard-page">
@@ -84,8 +86,12 @@ import { ErrorBannerComponent } from '@shared/components/error-banner/error-bann
                 <p class="stat-tile-label">Última actividad</p>
                 @if (loading()) {
                   <div class="h-7 w-32 rounded animate-pulse" style="background:var(--border-color)"></div>
+                } @else if (latestAt()) {
+                  <p class="stat-tile-value stat-tile-value--sm">{{ latestAt()! | relativeTime }}</p>
+                  <p class="stat-tile-meta" [attr.title]="latestAtLabel()">{{ latestAtLabel() }}</p>
                 } @else {
-                  <p class="stat-tile-value text-base">{{ latestAtLabel() }}</p>
+                  <p class="stat-tile-value stat-tile-value--sm">Sin actividad</p>
+                  <p class="stat-tile-meta">Aún no hay transcripciones</p>
                 }
               </div>
             </div>
@@ -113,7 +119,7 @@ import { ErrorBannerComponent } from '@shared/components/error-banner/error-bann
               </div>
               <div class="stat-tile-body">
                 <p class="stat-tile-label">Transcribir ahora</p>
-                <a mat-stroked-button color="primary" routerLink="/app/upload" class="mt-1 text-xs">
+                <a mat-stroked-button color="primary" routerLink="/app/upload" class="mt-1 text-xs whitespace-nowrap">
                   <mat-icon>upload_file</mat-icon>
                   Subir audio
                 </a>
@@ -146,16 +152,21 @@ import { ErrorBannerComponent } from '@shared/components/error-banner/error-bann
                 <div class="dash-card-icon" style="background:rgba(25,118,210,.1)">
                   <mat-icon style="color:#1976d2">monitor_heart</mat-icon>
                 </div>
-                <div>
+                <div class="flex-1 min-w-0">
                   <mat-card-title class="dash-card-title">Estado de servicios</mat-card-title>
                   <mat-card-subtitle class="dash-card-sub">
                     @if (loading()) { Verificando... }
+                    @else if (checkingServices()) { Algunos servicios se están iniciando, comprobando de nuevo… }
                     @else { Infraestructura backend en tiempo real }
                   </mat-card-subtitle>
                 </div>
+                <button mat-icon-button class="refresh-btn" (click)="refreshServices()"
+                        [disabled]="loading()" aria-label="Volver a comprobar servicios">
+                  <mat-icon [class.spin]="checkingServices()">refresh</mat-icon>
+                </button>
               </mat-card-header>
               <mat-card-content class="pt-2 pb-4 px-5">
-                <app-service-status-list [services]="services()" />
+                <app-service-status-list [services]="services()" [checking]="checkingServices()" />
               </mat-card-content>
             </mat-card>
 
@@ -189,6 +200,7 @@ import { ErrorBannerComponent } from '@shared/components/error-banner/error-bann
     .greeting-sub   { font-size: .88rem; color: rgba(255,255,255,.7); margin: 0; }
 
     .dashboard-body {
+      container: dashboard / inline-size;
       max-width: 1100px;
       margin: -20px auto 0;
       padding: 0 24px 48px;
@@ -197,12 +209,13 @@ import { ErrorBannerComponent } from '@shared/components/error-banner/error-bann
     /* Stats row */
     .stats-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
       margin-bottom: 24px;
 
-      @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
-      @media (max-width: 500px) { grid-template-columns: 1fr; }
+      /* Según el ancho real del contenido (con o sin menú lateral abierto) */
+      @container dashboard (max-width: 900px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      @container dashboard (max-width: 480px) { grid-template-columns: 1fr; }
     }
 
     .stat-tile {
@@ -227,6 +240,18 @@ import { ErrorBannerComponent } from '@shared/components/error-banner/error-bann
     .stat-tile-body { min-width: 0; flex: 1; }
     .stat-tile-label { font-size: .72rem; color: var(--text-muted); margin: 0 0 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
     .stat-tile-value { font-size: 1.6rem; font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -.5px; }
+    .stat-tile-value--sm {
+      font-size: 1.05rem; font-weight: 700; letter-spacing: -.2px; line-height: 1.3;
+      &::first-letter { text-transform: uppercase; }
+    }
+    .stat-tile-meta {
+      font-size: .75rem; color: var(--text-muted); margin: 2px 0 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .refresh-btn { color: var(--text-muted); }
+    .spin { animation: spin 1.2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .status-pill {
       display: inline-flex;
@@ -307,27 +332,94 @@ export class DashboardComponent implements OnInit {
     this.loading() ? null : (this.data()?.transcription_summary.total ?? 0)
   );
 
+  latestAt = computed<string | null>(() =>
+    this.loading() ? null : (this.data()?.transcription_summary.latest_at ?? null)
+  );
+
+  /** Fecha y hora compactas, p. ej. "06 nov. 2026 · 09:49" */
   latestAtLabel = computed<string | null>(() => {
-    if (this.loading()) return null;
-    const lat = this.data()?.transcription_summary.latest_at;
-    if (!lat) return 'Sin actividad';
-    return new Date(lat).toLocaleString('es-PE', {
-      day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit',
-    });
+    const lat = this.latestAt();
+    if (!lat) return null;
+    const d = new Date(lat);
+    const day  = d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+    const time = d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${day} · ${time}`;
   });
 
   services = computed(() => this.data()?.services ?? null);
 
+  /** true mientras se vuelven a consultar servicios que aún no responden */
+  readonly checkingServices = signal(false);
+
+  private readonly destroyRef = inject(DestroyRef);
+  private pollTimer: ReturnType<typeof setTimeout> | null = null;
+  private retries = 0;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.clearPoll());
+  }
+
   ngOnInit(): void { this.load(); }
   retry():  void   { this.load(); }
 
+  /** Botón "actualizar" del panel de servicios. */
+  refreshServices(): void {
+    this.retries = 0;
+    this.pollServices();
+  }
+
   private load(): void {
+    this.clearPoll();
     this.loading.set(true);
     this.hasError.set(false);
     this.dashSvc.getDashboard().subscribe({
-      next:  d  => { this.data.set(d); this.loading.set(false); },
+      next:  d  => {
+        this.data.set(d);
+        this.loading.set(false);
+        this.retries = 0;
+        this.scheduleServicesCheck(d.services);
+      },
       error: () => { this.hasError.set(true); this.loading.set(false); },
     });
   }
+
+  /**
+   * Con escalado a cero (Azure Container Apps) la primera consulta /health solo
+   * "despierta" al servicio y responde como no disponible. Mientras algún
+   * servicio no esté operativo se vuelve a consultar cada RETRY_MS (hasta
+   * MAX_RETRIES veces); luego se refresca cada REFRESH_MS.
+   */
+  private scheduleServicesCheck(services: ServiceStatusMap | null | undefined): void {
+    this.clearPoll();
+    const allHealthy = !!services && Object.values(services).every(s => s === 'healthy');
+    const keepTrying = !allHealthy && this.retries < DashboardComponent.MAX_RETRIES;
+    this.checkingServices.set(keepTrying);
+    const delay = keepTrying ? DashboardComponent.RETRY_MS : DashboardComponent.REFRESH_MS;
+    this.pollTimer = setTimeout(() => this.pollServices(), delay);
+  }
+
+  private pollServices(): void {
+    this.clearPoll();
+    this.retries++;
+    this.dashSvc.getServices().subscribe({
+      next: services => {
+        const current = this.data();
+        if (current) this.data.set({ ...current, services });
+        if (Object.values(services).every(s => s === 'healthy')) this.retries = 0;
+        this.scheduleServicesCheck(services);
+      },
+      error: () => this.scheduleServicesCheck(null),
+    });
+  }
+
+  private clearPoll(): void {
+    if (this.pollTimer !== null) {
+      clearTimeout(this.pollTimer);
+      this.pollTimer = null;
+    }
+  }
+
+  static readonly RETRY_MS    = 5_000;
+  static readonly MAX_RETRIES = 12;      // ~1 minuto reintentando
+  static readonly REFRESH_MS  = 60_000;
 }

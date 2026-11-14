@@ -29,35 +29,44 @@ const SERVICE_ORDER: ReadonlyArray<keyof ServiceStatusMap> = [
           <div class="flex items-center gap-2">
             @if (status === null) {
               <div class="w-5 h-5 bg-gray-200 rounded-full animate-pulse"></div>
+            } @else if (status === 'healthy') {
+              <mat-icon class="text-green-600" style="font-size:20px;width:20px;height:20px">check_circle</mat-icon>
+            } @else if (checking) {
+              <mat-icon class="text-amber-500 spin" style="font-size:20px;width:20px;height:20px">sync</mat-icon>
             } @else {
-              <mat-icon
-                [class]="status === 'healthy' ? 'text-green-600' : 'text-red-500'"
-                style="font-size:20px;width:20px;height:20px">
-                {{ status === 'healthy' ? 'check_circle' : 'error' }}
-              </mat-icon>
+              <mat-icon class="text-red-500" style="font-size:20px;width:20px;height:20px">error</mat-icon>
             }
             <span class="text-sm" style="color:var(--text-primary)">{{ serviceLabels[key] }}</span>
           </div>
 
           @if (status === null) {
             <div class="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+          } @else if (status === 'healthy') {
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">Operativo</span>
+          } @else if (checking) {
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700"
+                  matTooltip="El servicio se está iniciando; se volverá a comprobar en unos segundos">
+              Verificando…
+            </span>
           } @else {
-            <span
-              class="text-xs font-semibold px-2 py-0.5 rounded-full"
-              [class]="status === 'healthy'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-600'"
-              [matTooltip]="status === 'unavailable' ? 'Servicio no disponible' : ''">
-              {{ status === 'healthy' ? 'Operativo' : 'No disponible' }}
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600"
+                  matTooltip="Servicio no disponible">
+              No disponible
             </span>
           }
         </div>
       }
     </div>
   `,
+  styles: [`
+    .spin { animation: spin 1.2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  `],
 })
 export class ServiceStatusListComponent {
   @Input() services: ServiceStatusMap | null = null;
+  /** true mientras el panel vuelve a comprobar servicios que aún no responden */
+  @Input() checking = false;
   readonly serviceOrder  = SERVICE_ORDER;
   readonly serviceLabels = SERVICE_LABELS;
 }

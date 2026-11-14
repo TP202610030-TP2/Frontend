@@ -26,3 +26,6 @@ export interface DashboardData {
 
 /** GET /api/v1/dashboard devuelve ApiEnvelope<DashboardData> */
 export type DashboardResponse = ApiEnvelope<DashboardData>;
+
+/** GET /api/v1/dashboard/services devuelve ApiEnvelope<{ services }> */
+export type ServicesStatusResponse = ApiEnvelope<{ services: ServiceStatusMap }>;
